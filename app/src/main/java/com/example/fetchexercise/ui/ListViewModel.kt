@@ -1,6 +1,5 @@
 package com.example.fetchexercise.ui
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +33,6 @@ class ListViewModel(private val listRepository: ListRepository) : ViewModel() {
                     _allListItems.sortedWith(compareBy<ListItem> { it.listId }.thenBy {
                         extractItemNumber(it.name!!)
                     })
-                Log.d("ItemList", "Items: $groupedList")
                 ListUiState.Success(groupedList)
             } catch (e: IOException) {
                 ListUiState.Error
