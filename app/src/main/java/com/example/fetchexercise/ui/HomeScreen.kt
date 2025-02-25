@@ -2,6 +2,7 @@ package com.example.fetchexercise.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,10 +27,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fetchexercise.R
 import com.example.fetchexercise.model.ListItem
 
+@Composable
+fun FetchExerciseApp(modifier: Modifier = Modifier) {
+    val viewModel: ListViewModel = viewModel(factory = ListViewModel.Factory)
+
+    ListItemScreen(uiState = viewModel.uiState)
+}
+
+@Composable
+fun ListItemScreen(uiState: ListUiState, modifier: Modifier = Modifier) {
+    when (uiState) {
+        is ListUiState.Loading -> LoadingScreen()
+        is ListUiState.Success -> ListItemList(uiState.listItems)
+        is ListUiState.Error -> ErrorScreen()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FetchExerciseApp() {
-    val viewModel: ListViewModel = viewModel(factory = ListViewModel.Factory)
+fun ListItemList(listItems: List<ListItem>, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -41,31 +57,20 @@ fun FetchExerciseApp() {
                     Text(stringResource(R.string.list_items))
                 }
             )
-        },
-    ) { innerPadding ->
-        ListItemScreen(uiState = viewModel.uiState, modifier = Modifier.padding(innerPadding))
-    }
-}
-
-
-@Composable
-fun ListItemScreen(uiState: ListUiState, modifier: Modifier = Modifier) {
-    when (uiState) {
-        is ListUiState.Loading -> LoadingScreen()
-        is ListUiState.Success -> ListItemList(uiState.listItems)
-        is ListUiState.Error -> ErrorScreen()
-    }
-}
-
-@Composable
-fun ListItemList(listItems: List<ListItem>, modifier: Modifier = Modifier) {
-    LazyVerticalGrid(columns = GridCells.Adaptive(100.dp)) {
-        items(listItems.size) {
-            listItems[it].name?.let { item ->
-                ListItemCard(
-                    listItems[it].listId,
-                    item
-                )
+        }
+    ) { padding ->
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(100.dp),
+            contentPadding = PaddingValues(8.dp),
+            modifier = modifier.padding(padding)
+        ) {
+            items(listItems.size) {
+                listItems[it].name?.let { item ->
+                    ListItemCard(
+                        listItems[it].listId,
+                        item
+                    )
+                }
             }
         }
     }
